@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>File Browser</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f7f7f7;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #fff;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        .file-list {
+            list-style-type: none;
+            padding: 0;
+        }
+        .file-list li {
+            padding: 10px;
+            border-bottom: 1px solid #ddd;
+        }
+        .file-list li a {
+            text-decoration: none;
+            color: #007BFF;
+        }
+        .file-list li a:hover {
+            text-decoration: underline;
+        }
+        .flash-messages {
+            margin-bottom: 20px;
+        }
+        .flash-messages .error {
+            color: red;
+        }
+        .button {
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 16px;
+            margin: 10px 0;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+        .button:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>File Browser</h1>
+        <div class="flash-messages">
+            {% for message in get_flashed_messages(with_categories=true) %}
+                {% if message[0] == 'error' %}
+                    <p class="error">{{ message[1] }}</p>
+                {% endif %}
+            {% endfor %}
+        </div>
+        {% if parentPath is not none %}
+            <a href="{{ url_for('listFiles', subpath=parentPath.rstrip('/')) }}" class="button">Return</a>
+        {% endif %}
+        <ul class="file-list">
+            {% for item in items %}
+                <li>
+                    {% if item.is_dir %}
+                        <a href="{{ url_for('listFiles', subpath=item.path) }}">{{ item.name }}/</a>
+                    {% else %}
+                        <a href="{{ url_for('download_file', subpath=item.path) }}">{{ item.name }}</a>
+                    {% endif %}
+                </li>
+            {% endfor %}
+        </ul>
+    </div>
+</body>
+</html>

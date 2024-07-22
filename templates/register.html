@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register - My Flask App</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f7f7f7;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .register-container {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            width: 300px;
+            display: flex;
+            flex-direction: column; /* Stacks items vertically */
+            align-items: center; /* Centers items horizontally */
+        }
+        .register-container .flash-messages {
+            width: 100%; /* Takes up the full width of the container */
+            text-align: center; /* Centers the flash messages */
+            margin-bottom: 15px; /* Adds space below the flash message container */
+        }
+        .register-container h2 {
+            margin-top: 0; /* Removes the top margin to move the header higher up */
+            margin-bottom: 5px; /* Reduces the space below the header */
+            text-align: center; /* Centers the header text */
+        }
+        .register-container form {
+            display: flex;
+            flex-direction: column; /* Stacks form fields vertically */
+            width: 100%; /* Ensures the form takes up the full width of the container */
+        }
+        .register-container form input {
+            margin-bottom: 10px; /* Adds space between form fields */
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 3px;
+        }
+        .register-container form button {
+            padding: 10px;
+            background-color: #007BFF;
+            color: #fff;
+            border: none;
+            border-radius: 3px;
+            cursor: pointer;
+        }
+        .register-container form button:hover {
+            background-color: #0056b3;
+        }
+        .register-container .error {
+            color: red;
+        }
+    </style>
+</head>
+<body>
+    <div class="register-container">
+        <div class="flash-messages">
+            {% for message in get_flashed_messages(with_categories=true) %}
+                {% if message[0] == 'error' %}
+                    <p class="error">{{ message[1] }}</p>
+                {% endif %}
+            {% endfor %}
+        <h2>Register</h2>
+        </div>
+        <form action="{{ url_for('register') }}" method="post">
+            {{ form.hidden_tag() }}  <!-- CSRF protection -->
+            {{ form.email.label }} {{ form.email() }}
+            {{ form.password.label }} {{ form.password() }}
+            {{ form.submit() }}
+        </form>
+    </div>
+</body>
+</html>

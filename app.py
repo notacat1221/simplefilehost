@@ -97,7 +97,7 @@ def login():
             session['email'] = email #if user validated successfully, set email in session data so that user remains signed in
         else:
             flash('Invalid credentials', 'error')
-    return render_template('login.html', form=form)
+    return render_template('login.html', form = form)
 
 @app.route('/register', methods = ['GET', 'POST'])
 def register():

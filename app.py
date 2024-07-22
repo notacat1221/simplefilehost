@@ -135,7 +135,6 @@ def listFiles(subpath):
     if not os.path.exists(fullPath):
         flash('No such directory found')
         return redirect(url_for('listFiles'))
-        print("no directory")
 
     parentPath = os.path.dirname(subpath)
     items = []

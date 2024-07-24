@@ -59,6 +59,11 @@
     </style>
 </head>
 <body>
+    {% extends "sidebar.html" %}
+
+    {% block title %}Share Files{% endblock %}
+
+    {% block content %}
     <div class="container">
         <h1>File Browser</h1>
         <div class="flash-messages">
@@ -69,19 +74,21 @@
             {% endfor %}
         </div>
         {% if parentPath is not none %}
-            <a href="{{ url_for('listFiles', subpath=parentPath.rstrip('/')) }}" class="button">Return</a>
+            <a href="{{ url_for('share', subpath=parentPath.rstrip('/')) }}" class="button">Return</a>
         {% endif %}
+        <a href="{{ url_for('download', subpath=subpath) }}" class="button">Download Directory</a>
         <ul class="file-list">
             {% for item in items %}
                 <li>
                     {% if item.is_dir %}
-                        <a href="{{ url_for('listFiles', subpath=item.path) }}">{{ item.name }}/</a>
+                        <a href="{{ url_for('share', subpath=item.path) }}">{{ item.name }}/</a>
                     {% else %}
-                        <a href="{{ url_for('download_file', subpath=item.path) }}">{{ item.name }}</a>
+                        <a href="{{ url_for('download', subpath=item.path) }}">{{ item.name }}</a>
                     {% endif %}
                 </li>
             {% endfor %}
         </ul>
     </div>
+    {% endblock %}
 </body>
 </html>

@@ -14,8 +14,9 @@ from werkzeug.utils import secure_filename
 
 import os, zipfile
 app = Flask(__name__)
-bcrypt = Bcrypt(app)
-BASE_DIR = 'share'
+bcrypt = Bcrypt(app) #Encryption with app context
+db = SQLAlchemy(app) #Create database with app context
+BASE_DIR = 'share' #Base file directory from which application will pull from
 
 class Config:
     SECRET_KEY = os.environ.get('SECRET_KEY', 'default_secret_key')
@@ -50,14 +51,15 @@ WTF_CSRF_SECRET_KEY = app.config.get('WTF_CSRF_SECRET_KEY')
 if not WTF_CSRF_SECRET_KEY or WTF_CSRF_SECRET_KEY == 'default_csrf_secret_key':
     raise ValueError("No CSRF_SECRET_KEY set for Flask application. Please set it via environment variables.")
 
-#Declare database now that SQL config is set
-db = SQLAlchemy(app)
 
-#Construct user class for database and create the associated db tables
+
+#Construct user class for database
 class User(db.Model):
     id = db.Column(db.Integer, primary_key = True)
     email = db.Column(db.String(120), unique = True, nullable = False)
     hashedPass = db.Column(db.String(120), nullable = False)
+
+#Create tables
 with app.app_context():
     db.create_all()
 
@@ -72,14 +74,14 @@ class RegisterForm(FlaskForm):
     password = PasswordField('Password', validators = [DataRequired()])
     submit = SubmitField('Register')
 
-#Ensure that user is properly authenticated with valid session data
+#Ensure that user is properly authenticated
 @app.before_request
 def require_login():
-    if 'id' not in session and request.endpoint not in ['login', 'register']: # dont check authentication for login and register pages as unauthenticated users must still access
-        return redirect(url_for('login'))
+    if 'id' not in session and request.endpoint not in ['login', 'register']: # dont check authentication for login and register pages
+        return redirect(url_for('login')) #Redirect unauthenticated users to /login
 
 @app.route('/')
-def landingZone():  # put application's code here
+def landingZone():  # 
     return render_template('index.html')
 
 
@@ -90,8 +92,8 @@ def login():
     if form.validate_on_submit(): #Checks that submitted login form adheres to input validation rules
         email = form.email.data
         password = form.password.data
-
-        user = User.query.filter_by(email=email).first()
+        #Query database for user by sorting for email
+        user = User.query.filter_by(email=email).first() 
         if user and bcrypt.check_password_hash(user.hashedPass, password): #Check stored password hash against input using bcrypt, ensure it matches to the correct user
             session['id'] = user.id #if user validated successfully, set user id in session data so that user remains signed in
             return redirect(url_for('landingZone'))
@@ -105,16 +107,18 @@ def register():
     if form.validate_on_submit():
         email = form.email.data
         password = form.password.data
-
+        #Generate hashed password for security, password is never stored in plaintext
         hashedPass = bcrypt.generate_password_hash(password).decode('utf-8')
+        password = None
+        
+        #Create user object to commit do database
         user = User(email=email, hashedPass=hashedPass)
-
         try:
             db.session.add(user) #Add user to database
             db.session.commit() #Commit changes
             flash('You have successfully registered! Now log in', 'success')
             return redirect(url_for('login'))
-        except IntegrityError: #CHANGE
+        except:
             db.session.rollback()
             flash('Email already registered', 'error')
     return render_template('register.html', form = form)

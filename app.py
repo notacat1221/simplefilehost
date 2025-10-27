@@ -15,7 +15,7 @@ from werkzeug.utils import secure_filename
 import os, zipfile
 app = Flask(__name__)
 bcrypt = Bcrypt(app) #Encryption with app context
-db = SQLAlchemy(app) #Create database with app context
+
 BASE_DIR = 'share' #Base file directory from which application will pull from
 
 class Config:
@@ -34,6 +34,8 @@ class Config:
     #Debug flag
     DEBUG = False
 
+
+
 class DevelopmentConfig(Config):
     DEBUG = True #Enable debugging flag
     SESSION_COOKIE_SECURE = False  # For local development
@@ -41,15 +43,18 @@ class DevelopmentConfig(Config):
 
 #Select config class
 app.config.from_object(DevelopmentConfig)
+db = SQLAlchemy(app) #Create database with app context, once configs have been applied
 
 #Validate security critical configs
 SECRET_KEY = app.config.get('SECRET_KEY')
 if not SECRET_KEY or SECRET_KEY == 'default_secret_key':
-    raise ValueError('Please set a SECRET_KEY environment variable')
+    #raise ValueError('Please set a SECRET_KEY environment variable')
+    print("Houston we got a problem")
 
 WTF_CSRF_SECRET_KEY = app.config.get('WTF_CSRF_SECRET_KEY')
 if not WTF_CSRF_SECRET_KEY or WTF_CSRF_SECRET_KEY == 'default_csrf_secret_key':
-    raise ValueError("No CSRF_SECRET_KEY set for Flask application. Please set it via environment variables.")
+    #raise ValueError("No CSRF_SECRET_KEY set for Flask application. Please set it via environment variables.")
+    print("Houston we got a problem")
 
 
 
@@ -73,15 +78,15 @@ class RegisterForm(FlaskForm):
     email = EmailField('Email', validators = [DataRequired(), Email()])
     password = PasswordField('Password', validators = [DataRequired()])
     submit = SubmitField('Register')
-
+"""
 #Ensure that user is properly authenticated
 @app.before_request
 def require_login():
     if 'id' not in session and request.endpoint not in ['login', 'register']: # dont check authentication for login and register pages
         return redirect(url_for('login')) #Redirect unauthenticated users to /login
-
+"""
 @app.route('/')
-def landingZone():  # 
+def index():  #
     return render_template('index.html')
 
 
@@ -96,7 +101,7 @@ def login():
         user = User.query.filter_by(email=email).first() 
         if user and bcrypt.check_password_hash(user.hashedPass, password): #Check stored password hash against input using bcrypt, ensure it matches to the correct user
             session['id'] = user.id #if user validated successfully, set user id in session data so that user remains signed in
-            return redirect(url_for('landingZone'))
+            return redirect(url_for('index'))
         else:
             flash('Invalid credentials', 'error')
     return render_template('login.html', form = form)

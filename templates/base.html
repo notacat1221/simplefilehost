@@ -1,9 +1,10 @@
+<!-- templates/base.html -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}My App{% endblock %}</title>
+    <title>{% block title %}Simple Filehost{% endblock %}</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
     <style>
         body {
@@ -15,7 +16,7 @@
         }
         .sidebar {
             width: 200px;
-            background-color: #007BFF; /* Blue color */
+            background-color: #007BFF;
             color: white;
             padding: 15px;
             box-shadow: 2px 0 5px rgba(0,0,0,0.1);
@@ -37,7 +38,7 @@
         }
         .sidebar ul li a {
             text-decoration: none;
-            color: white; /* White text color */
+            color: white;
         }
         .sidebar ul li a:hover {
             text-decoration: underline;
@@ -50,14 +51,7 @@
     </style>
 </head>
 <body>
-    <div class="sidebar">
-        <h2>Navigate</h2>
-        <ul>
-            <li><a href="{{ url_for('index') }}">Home</a></li>
-            <li><a href="{{ url_for('share') }}">Share</a></li>
-            <li><a href="{{ url_for('logout') }}">Logout</a></li>
-        </ul>
-    </div>
+    {% include 'sidebar.html' %}
     <div class="main-content">
         {% block content %}{% endblock %}
     </div>
